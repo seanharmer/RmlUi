@@ -134,7 +134,7 @@ void ElementDecoration::ReleaseDecorators()
 }
 
 
-void ElementDecoration::RenderDecorators()
+void ElementDecoration::RenderDecorators(RenderStage render_stage)
 {
 	InstanceDecorators();
 	ReloadDecoratorsData();
@@ -144,7 +144,7 @@ void ElementDecoration::RenderDecorators()
 	for (int i = (int)decorators.size() - 1; i >= 0; i--)
 	{
 		DecoratorHandle& decorator = decorators[i];
-		decorator.decorator->RenderElement(element, decorator.decorator_data);
+		decorator.decorator->RenderElement(element, decorator.decorator_data, render_stage);
 	}
 }
 
