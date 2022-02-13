@@ -932,11 +932,13 @@ PropertyIdSet ElementStyle::ComputeValues(Style::ComputedValues& values, const S
 		case PropertyId::JustifyContent:
 			values.justify_content = (JustifyContent)p->Get<int>();
 			break;
+		case PropertyId::BoxShadow:
+			values.has_box_shadow = (p->value.GetType() == Variant::SHADOWLIST && !p->value.GetReference<ShadowList>().empty());
+			break;
 
 		// Unhandled properties. Must be manually retrieved with 'GetProperty()'.
 		case PropertyId::FillImage:
 		case PropertyId::CaretColor:
-		case PropertyId::BoxShadow:
 			break;
 		// Invalid properties
 		case PropertyId::Invalid:

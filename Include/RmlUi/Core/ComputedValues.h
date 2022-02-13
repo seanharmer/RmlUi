@@ -229,6 +229,7 @@ struct ComputedValues
 
 	bool has_decorator = false;
 	bool has_font_effect = false;
+	bool has_box_shadow = false;
 
 	AlignContent align_content = AlignContent::Stretch;
 	AlignItems align_items = AlignItems::Stretch;
