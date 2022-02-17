@@ -298,7 +298,10 @@ void DecoratorLinearGradient::RenderElement(Element* element, DecoratorDataHandl
 	if (!render_interface)
 		return;
 
-	render_interface->RenderEffect(CompiledEffectHandle(element_data), render_stage, 0, element);
+	if (render_stage == RenderStage::Decoration)
+	{
+		render_interface->RenderEffect(CompiledEffectHandle(element_data), RenderSource::Stack, RenderTarget::Stack);
+	}
 }
 
 DecoratorLinearGradientInstancer::DecoratorLinearGradientInstancer()
