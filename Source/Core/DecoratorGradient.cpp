@@ -117,7 +117,7 @@ void DecoratorGradient::RenderElement(Element* element, DecoratorDataHandle elem
 	data->Render(element->GetAbsoluteOffset(Box::BORDER));
 }
 
-DecoratorGradientInstancer::DecoratorGradientInstancer()
+DecoratorGradientInstancer::DecoratorGradientInstancer() : DecoratorInstancer(DecoratorClasses::Background)
 {
 	ids.direction = RegisterProperty("direction", "horizontal").AddParser("keyword", "horizontal, vertical").GetId();
 	ids.start = RegisterProperty("start-color", "#ffffff").AddParser("color").GetId();
@@ -304,7 +304,7 @@ void DecoratorLinearGradient::RenderElement(Element* element, DecoratorDataHandl
 	}
 }
 
-DecoratorLinearGradientInstancer::DecoratorLinearGradientInstancer()
+DecoratorLinearGradientInstancer::DecoratorLinearGradientInstancer() : DecoratorInstancer(DecoratorClasses::Background)
 {
 	ids.angle = RegisterProperty("angle", "180deg").AddParser("angle").GetId();
 	ids.color_stop_list = RegisterProperty("color-stops", "").AddParser("color_stop_list").GetId();
