@@ -15,7 +15,7 @@
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,16 +28,15 @@
 
 #include "ElementDecoration.h"
 #include "../../Include/RmlUi/Core/Decorator.h"
+#include "../../Include/RmlUi/Core/DecoratorInstancer.h"
 #include "../../Include/RmlUi/Core/Element.h"
 #include "../../Include/RmlUi/Core/ElementDocument.h"
 #include "../../Include/RmlUi/Core/Profiling.h"
-#include "../../Include/RmlUi/Core/DecoratorInstancer.h"
 #include "../../Include/RmlUi/Core/StyleSheet.h"
 
 namespace Rml {
 
-ElementDecoration::ElementDecoration(Element* _element) : element(_element)
-{}
+ElementDecoration::ElementDecoration(Element* _element) : element(_element) {}
 
 ElementDecoration::~ElementDecoration()
 {
@@ -148,13 +147,12 @@ void ElementDecoration::ReleaseDecorators()
 	decorators.clear();
 }
 
-
 void ElementDecoration::RenderDecorators(RenderStage render_stage)
 {
 	InstanceDecorators();
 	ReloadDecoratorsData();
 
-	if (!num_backgrounds || !num_filters || !num_backdrop_filters)
+	if (!num_backgrounds && !num_filters && !num_backdrop_filters)
 		return;
 
 	if (num_backgrounds > 0)
@@ -166,7 +164,7 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 			for (int i = num_backgrounds - 1; i >= 0; i--)
 			{
 				DecoratorHandle& decorator = decorators[i];
-				decorator.decorator->RenderElement(element, decorator.decorator_data, render_stage);
+				decorator.decorator->RenderElement(element, decorator.decorator_data);
 			}
 		}
 	}
@@ -180,27 +178,38 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 		if (render_stage == RenderStage::Enter)
 		{
 			render_interface->ExecuteRenderCommand(RenderCommand::StackPush);
+
 		}
 		else if (render_stage == RenderStage::Exit)
 		{
-			render_interface->ExecuteRenderCommand(RenderCommand::StackToFilter);
-
-			// TODO: clipping w/extents (or let decorators do it for us?)
-			//ElementUtilities::ForceClippingRegion(element, Box::BORDER, Vector2f(-radius), Vector2f(2.f * radius));
-
+			Vector2f max_top_left, max_bottom_right;
 			const int i0 = num_backgrounds;
 			for (int i = i0 + num_filters - 1; i >= i0; i--)
 			{
 				DecoratorHandle& decorator = decorators[i];
-				decorator.decorator->RenderElement(element, decorator.decorator_data, render_stage);
+				Vector2f top_left, bottom_right;
+
+				decorator.decorator->GetClipExtension(top_left, bottom_right);
+
+				max_top_left = Math::Max(max_top_left, top_left);
+				max_bottom_right = Math::Max(max_bottom_right, bottom_right);
 			}
 
-			//render_interface->RenderEffect(CompiledEffectHandle(element_data), RenderSource::Stack, RenderTarget::StackBelow);
+			Vector2f filter_origin, filter_size;
+			ElementUtilities::GetElementRegionInWindowSpace(filter_origin, filter_size, element, Box::BORDER, max_top_left, max_bottom_right);
+
+			render_interface->ExecuteRenderCommand(RenderCommand::StackToFilter, filter_origin, filter_size);
+
+			for (int i = i0 + num_filters - 1; i >= i0; i--)
+			{
+				DecoratorHandle& decorator = decorators[i];
+				decorator.decorator->RenderElement(element, decorator.decorator_data);
+			}
 
 			render_interface->ExecuteRenderCommand(RenderCommand::StackPop);
 			render_interface->ExecuteRenderCommand(RenderCommand::FilterToStack);
 
-			//Rml::ElementUtilities::ApplyActiveClipRegion(element->GetContext(), render_interface);
+			ElementUtilities::ApplyActiveClipRegion(element->GetContext(), render_interface);
 		}
 	}
 
@@ -208,22 +217,20 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 	{
 		if (render_stage == RenderStage::BeforeDecoration)
 		{
-			render_interface->ExecuteRenderCommand(RenderCommand::StackToFilter);
-			//ElementUtilities::ForceClippingRegion(element, Box::BORDER, Vector2f(-radius), Vector2f(2.f * radius));
+			Vector2f filter_origin, filter_size;
+			ElementUtilities::GetElementRegionInWindowSpace(filter_origin, filter_size, element, Box::BORDER);
+			
+			ElementUtilities::ForceClippingRegion(element, Box::BORDER);
+			render_interface->ExecuteRenderCommand(RenderCommand::StackToFilter, filter_origin, filter_size);
 
 			const int i0 = num_backgrounds + num_filters;
 			for (int i = i0 + num_backdrop_filters - 1; i >= i0; i--)
 			{
 				DecoratorHandle& decorator = decorators[i];
-				decorator.decorator->RenderElement(element, decorator.decorator_data, render_stage);
+				decorator.decorator->RenderElement(element, decorator.decorator_data);
 			}
 
-
-			//render_interface->RenderEffect(CompiledEffectHandle(element_data), RenderSource::Stack, RenderTarget::Stack);
-
 			render_interface->ExecuteRenderCommand(RenderCommand::FilterToStack);
-
-			//Rml::ElementUtilities::ApplyActiveClipRegion(element->GetContext(), render_interface);
 		}
 	}
 }
