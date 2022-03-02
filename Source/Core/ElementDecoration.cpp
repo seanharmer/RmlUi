@@ -181,7 +181,7 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 		if (render_stage == RenderStage::Enter)
 		{
 			ElementUtilities::ApplyTransform(element);
-			ElementUtilities::ForceClippingRegion(element, Box::BORDER);
+			ElementUtilities::SetClippingRegion(element, true);
 
 			Vector2f filter_origin, filter_size;
 			ElementUtilities::GetElementRegionInWindowSpace(filter_origin, filter_size, element, Box::BORDER);
@@ -196,8 +196,7 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 
 			// ElementUtilities::ForceClippingRegion(element, Box::BORDER);
 			render_interface->ExecuteRenderCommand(RenderCommand::FilterToStack);
-
-			ElementUtilities::ApplyActiveClipRegion(render_interface, context->GetRenderState());
+			ElementUtilities::SetClippingRegion(element);
 		}
 	}
 

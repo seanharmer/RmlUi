@@ -209,6 +209,7 @@ bool Context::Render()
 
 	render_interface->context = this;
 	render_state = RenderState{};
+	render_state.supports_stencil = render_interface->StencilCommand(StencilCommand::None);
 	ElementUtilities::ApplyActiveClipRegion(render_interface, render_state);
 
 	root->Render();
