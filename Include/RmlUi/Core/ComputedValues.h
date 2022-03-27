@@ -231,6 +231,7 @@ struct ComputedValues
 	bool has_font_effect = false;
 	bool has_filter = false;
 	bool has_backdrop_filter = false;
+	bool has_mask_image = false;
 	bool has_box_shadow = false;
 
 	AlignContent align_content = AlignContent::Stretch;
