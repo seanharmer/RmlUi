@@ -234,7 +234,7 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 		}
 		else if (render_stage == RenderStage::Exit)
 		{
-			ElementUtilities::DisableClippingRegion(context);
+			ElementUtilities::SetClippingRegion(element);
 
 			Vector2f max_top_left, max_bottom_right;
 			const int i0 = num_backgrounds + num_backdrop_filters;
@@ -277,9 +277,7 @@ void ElementDecoration::RenderDecorators(RenderStage render_stage)
 				render_interface->ExecuteRenderCommand(RenderCommand::StackPop);
 			}
 
-
 			render_interface->ExecuteRenderCommand(RenderCommand::FilterToStack);
-			ElementUtilities::ApplyActiveClipRegion(render_interface, context->GetRenderState());
 		}
 	}
 }
