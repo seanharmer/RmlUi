@@ -18,6 +18,7 @@
 
 # VS user project files
 .vs/
+.vscode/
 *.suo
 *.user
 *.opensdf
