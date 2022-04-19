@@ -379,10 +379,12 @@ if( ENABLE_SVG_PLUGIN )
 	
 	message("-- Can SVG plugin be enabled - looking for lunasvg library")
 
-	find_package(lunasvg REQUIRED)
-	
-	list(APPEND CORE_LINK_LIBS ${LUNASVG_LIBRARIES})
-	list(APPEND CORE_INCLUDE_DIRS ${LUNASVG_INCLUDE_DIR})
+	if(NOT TARGET lunasvg::lunasvg)
+		find_package(lunasvg REQUIRED)
+	endif()
+
+	list(APPEND CORE_LINK_LIBS lunasvg::lunasvg)
+	list(APPEND CORE_INCLUDE_DIRS ${lunasvg_INCLUDE_DIR})
 	list(APPEND CORE_PRIVATE_DEFS RMLUI_ENABLE_SVG_PLUGIN)
 	
 	list(APPEND Core_HDR_FILES ${SVG_HDR_FILES})
