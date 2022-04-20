@@ -346,29 +346,22 @@ if( ENABLE_LOTTIE_PLUGIN )
 		set(rlottie_DIR $ENV{RLOTTIE_DIR})
 	endif()
 
-	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/rlottie/build)
-	find_package(rlottie CONFIG)
-	find_path(rlottie_INCLUDE_DIR rlottie.h HINTS ${rlottie_DIR} $ENV{rlottie_DIR} PATH_SUFFIXES inc rlottie/inc )
-	
-	if(rlottie_FOUND AND rlottie_INCLUDE_DIR)
-		message("-- Can Lottie plugin be added to RmlCore - yes - rlottie library found")
-		
-		list(APPEND CORE_LINK_LIBS rlottie::rlottie)
-		list(APPEND CORE_INCLUDE_DIRS ${rlottie_INCLUDE_DIR})
-		list(APPEND CORE_PRIVATE_DEFS RMLUI_ENABLE_LOTTIE_PLUGIN)
-		
-		list(APPEND Core_HDR_FILES ${Lottie_HDR_FILES})
-		list(APPEND Core_PUB_HDR_FILES ${Lottie_PUB_HDR_FILES})
-		list(APPEND Core_SRC_FILES ${Lottie_SRC_FILES})
-	else()
-		if(rlottie_FOUND)
-			message(FATAL_ERROR "-- Can Lottie plugin be added to RmlCore - no - rlottie library found - rlottie include directory not found")
-		elseif(rlottie_INCLUDE_DIR)
-			message(FATAL_ERROR "-- Can Lottie plugin be added to RmlCore - no - rlottie library not found - rlottie include directory found at ${rlottie_INCLUDE_DIR}")
-		else()
-			message(FATAL_ERROR "-- Can Lottie plugin be added to RmlCore - no - rlottie not found")
-		endif()
+	if(NOT TARGET rlottie::rlottie)
+		list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/rlottie/build)
+		find_package(rlottie CONFIG)
+		find_path(rlottie_INCLUDE_DIR rlottie.h HINTS ${rlottie_DIR} $ENV{rlottie_DIR} PATH_SUFFIXES inc rlottie/inc )
 	endif()
+	
+	list(APPEND CORE_LINK_LIBS rlottie::rlottie)
+	list(APPEND CORE_INCLUDE_DIRS ${rlottie_INCLUDE_DIR})
+	list(APPEND CORE_PRIVATE_DEFS RMLUI_ENABLE_LOTTIE_PLUGIN)
+	
+	list(APPEND Core_HDR_FILES ${Lottie_HDR_FILES})
+	list(APPEND Core_PUB_HDR_FILES ${Lottie_PUB_HDR_FILES})
+	list(APPEND Core_SRC_FILES ${Lottie_SRC_FILES})
+
+	message("-- Can Lottie plugin be added to RmlCore - yes - rlottie library found")
+
 endif()
 
 # lunasvg
